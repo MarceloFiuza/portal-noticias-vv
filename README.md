@@ -14,7 +14,7 @@ O conteúdo de apoio da página é uma **adaptação educativa** de publicaçõe
 | Atualização do GOV.BR busca facilitar o uso por pessoas com deficiência | Metrô News, com crédito à Agência Brasil | 11/11/2025 | <https://metronews.com.br/atualizacao-do-app-gov-br-melhora-acessibilidade-para-pessoas-com-deficiencia/> |
 | TSE apresenta mudanças na interface da urna para ampliar a acessibilidade | Tribunal Superior Eleitoral (TSE) | publicada em 08/08/2026 e atualizada em 08/10/2026 | <https://www.tse.jus.br/comunicacao/noticias/2026/Agosto/urna-eletronica-ganha-nova-interface-para-tornar-votacao-mais-acessivel-e-intuitiva> |
 
-Os dados editoriais foram fornecidos integralmente no pedido. **As páginas de origem não foram acessadas nesta execução**, portanto não há data de consulta registrada e os títulos originais não puderam ser conferidos; os títulos acima são os utilizados nas adaptações.
+As páginas de origem não foram consultadas; portanto, não há data de consulta registrada e os títulos originais não foram conferidos. Os títulos acima são os utilizados nas adaptações.
 
 A autoria da aplicação — código, desenho experimental, textos de apoio e a ilustração local `assets/noticia.svg` — pertence ao projeto acadêmico da disciplina de Verificação e Validação de Software. A autoria e a responsabilidade pelas informações jornalísticas são dos veículos, órgãos e pessoas citados. A ilustração é um recurso próprio do projeto e não reproduz fotografias, logotipos ou imagens das fontes.
 
@@ -26,7 +26,7 @@ Os endereços das fontes são apenas links de navegação, abertos na mesma aba 
 - npm `10.9.9`
 - `http-server` `14.1.1` (dependência de desenvolvimento com versão fixada)
 
-A verificação foi feita no Google Chrome `156` em modo headless. A aplicação em si não exige navegador específico além de um navegador moderno com suporte a `URLSearchParams`, `performance.now()` e `DOMContentLoaded`.
+A verificação funcional das 30 combinações foi realizada no Google Chrome `156` em modo headless, limitada a funcionamento, presença do defeito ou da correção, prontidão e ausência de erros JavaScript. A aplicação em si não exige navegador específico além de um navegador moderno com suporte a `URLSearchParams`, `performance.now()` e `DOMContentLoaded`.
 
 ## Instalação e execução
 
@@ -217,7 +217,6 @@ Também é possível conferir o estado diretamente no DOM com `document.querySel
 
 ```text
 .
-├── AGENTS.md
 ├── SPEC.md
 ├── README.md
 ├── package.json

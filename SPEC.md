@@ -236,7 +236,7 @@ A aplicação não registra resultados de detecção de acessibilidade. As estra
 - Painel de configuração.
 - Resultados, métricas ou alegações de detecção de acessibilidade.
 - Pesquisa real, compartilhamento real ou navegação automática para fora da página. Os links de fonte só navegam quando acionados pelo usuário, na mesma aba.
-- Backend, banco de dados, framework, TypeScript ou build.
+- Backend, banco de dados, framework, TypeScript, etapa de build, bibliotecas externas, fontes remotas, analytics, CDN ou outros recursos remotos; a aplicação usa HTML, CSS e JavaScript puros e somente recursos locais.
 
 ## 10. Registro da mudança editorial
 
