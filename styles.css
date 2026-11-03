@@ -11,6 +11,8 @@
   --erro-fundo: #fdecec;
   --erro-borda: #e7a7a7;
   --destaque-claro: #f9d78b;
+  /* Contraste de 6,8:1 sobre o branco, acima do mínimo de 3:1 da WCAG 2.2 1.4.11. */
+  --foco: #8a4b00;
 }
 
 *,
@@ -196,7 +198,7 @@ main {
 
 .campo-busca:focus-visible {
   border-color: var(--destaque);
-  outline: 3px solid #f2b134;
+  outline: 3px solid var(--foco);
   outline-offset: 2px;
 }
 
@@ -227,7 +229,7 @@ main {
 
 .botao-icone:focus-visible,
 .link-icone:focus-visible {
-  outline: 3px solid #f2b134;
+  outline: 3px solid var(--foco);
   outline-offset: 3px;
 }
 
@@ -292,7 +294,7 @@ main {
 }
 
 a:focus-visible {
-  outline: 3px solid #f2b134;
+  outline: 3px solid var(--foco);
   outline-offset: 3px;
 }
 

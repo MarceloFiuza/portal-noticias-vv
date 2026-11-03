@@ -28,7 +28,7 @@ O projeto contempla cinco tipos de componente, cada um com duas versões. Todos 
 
 Cada execução avalia um tipo por vez. O planejamento completo contempla 5 tipos × 2 versões × 3 condições de carregamento = 30 combinações, além das diferentes execuções e repetições experimentais.
 
-As 30 combinações — 5 tipos × 2 versões × 3 condições de carregamento — representam configurações da aplicação. Estratégias de teste, ferramentas, repetições e coleta de resultados serão definidas separadamente. A disponibilidade dos cenários não comprova que qualquer ferramenta detecte as violações. As combinações foram verificadas apenas quanto a funcionamento, presença do defeito/correção, prontidão e ausência de erros JavaScript; **nenhuma análise automatizada de acessibilidade foi realizada nesta etapa**.
+As 30 combinações — 5 tipos × 2 versões × 3 condições de carregamento — representam configurações da aplicação. Estratégias de teste, ferramentas, repetições e coleta de resultados serão definidas separadamente. A disponibilidade dos cenários não comprova que qualquer ferramenta detecte as violações. As combinações foram verificadas quanto a funcionamento, presença do defeito/correção, prontidão, consistência entre DOM e `window.experimento` e ausência de erros JavaScript; **nenhuma avaliação de conformidade por ferramenta automatizada foi realizada nesta etapa**.
 
 ## 3. Página
 
@@ -46,7 +46,7 @@ A página deve:
 - apresentar somente o componente correspondente ao parâmetro `tipo` dentro de `#componente`;
 - não conter painel de configuração: os cenários são selecionados pela URL.
 
-A página básica deve evitar violações adicionais conhecidas, usando HTML semântico, hierarquia de títulos, contraste adequado no conteúdo de apoio e landmarks.
+A página básica deve evitar violações adicionais conhecidas, usando HTML semântico, hierarquia de títulos, contraste adequado no conteúdo de apoio e landmarks. O indicador de foco da estrutura de apoio usa uma cor com contraste de pelo menos 3:1 sobre o fundo branco, conforme a WCAG 2.2 SC 1.4.11. Essa é uma verificação da estrutura de apoio, não dos cinco defeitos intencionais.
 
 ### 3.1 Conteúdo editorial
 
@@ -60,7 +60,7 @@ O conteúdo de apoio é composto por adaptações educativas de três publicaç�
 
 Cada notícia exibe título, resumo, crédito e um link descritivo para a fonte. Os créditos ficam fora de `#componente` e não são associados por `label`, `aria-label` ou `aria-labelledby` aos elementos experimentais, para não lhes fornecer nome acessível acidental.
 
-As notícias e atribuições estão armazenadas no próprio HTML/JavaScript. A aplicação não faz `fetch`, `iframe`, `prefetch` ou `prerender`; os endereços das fontes são apenas links de navegação, preferencialmente na mesma aba.
+As notícias e atribuições estão armazenadas no próprio HTML; o texto do componente `contraste` repete o resumo da notícia 1 e é criado em `app.js`. A aplicação não faz `fetch`, `iframe`, `prefetch` ou `prerender`; os endereços das fontes são apenas links de navegação, preferencialmente na mesma aba.
 
 A ilustração `assets/noticia.svg` é um recurso próprio do projeto, identificado como ilustração, e não reproduz fotografias, logotipos ou imagens das fontes.
 
@@ -164,6 +164,24 @@ Cálculo pelas luminâncias relativas das cores:
 
 O link aponta para o destino local estável `#noticia-corredor-verde`, identificador mantido por compatibilidade e associado ao artigo sobre a urna eletrônica. Também são estáveis `#cenario`, `#componente` e `#mensagem-estado`.
 
+### 5.7 Critérios WCAG 2.2 correspondentes
+
+A tabela relaciona cada defeito intencional ao critério WCAG 2.2 que ele contraria. Ela não afirma que uma ferramenta específica detectará a violação.
+
+| Tipo | Critério WCAG 2.2 | Nível | Regra ACT relacionada (W3C) |
+| --- | --- | --- | --- |
+| `imagem` | 1.1.1 Non-text Content | A | Image has non-empty accessible name |
+| `campo` | 4.1.2 Name, Role, Value | A | Form field has non-empty accessible name |
+| `campo` | 1.3.1 Info and Relationships | A | Form field has non-empty accessible name |
+| `botao` | 4.1.2 Name, Role, Value | A | Button has non-empty accessible name |
+| `contraste` | 1.4.3 Contrast (Minimum) | AA | Text has minimum contrast |
+| `link` | 4.1.2 Name, Role, Value | A | Link has non-empty accessible name |
+| `link` | 2.4.4 Link Purpose (In Context) | A | Link has non-empty accessible name |
+
+Os critérios WCAG são normativos; as regras ACT são métodos de teste informativos do W3C e não equivalentes aos critérios. Regras implementadas por axe-core ou QualWeb podem cobrir apenas parte de um critério, ter outro nome e outro escopo. A correspondência entre regras de ferramenta e critérios, bem como a detecção efetiva, só será verificada no estudo-piloto; nada nesta seção antecipa esse resultado.
+
+Fontes consultadas: [WCAG 2.2](https://www.w3.org/TR/WCAG22/), [Understanding WCAG 2.2](https://www.w3.org/WAI/WCAG22/Understanding/) e [ACT Rules](https://www.w3.org/WAI/standards-guidelines/act/rules/).
+
 ## 6. Condições de carregamento
 
 O `app.js` deve ser carregado de modo que sua inicialização ocorra antes de `DOMContentLoaded`, com o HTML necessário já disponível.
@@ -176,7 +194,7 @@ Todos os tipos usam o mesmo agendamento. Não devem existir esperas artificiais,
 
 O marco inicial dos atrasos `fixa` e `variavel` é o instante em que o listener de `DOMContentLoaded` registra `instanteDomContentLoaded`; a contagem do agendamento começa nesse marco. Na condição `imediata`, não há atraso: a inserção ocorre durante a inicialização, antes de `DOMContentLoaded`.
 
-`atrasoProgramado`, exposto em `window.experimento`, é o valor configurado para o agendamento, em milissegundos. O tempo efetivamente observado é obtido por `instanteInsercao - instanteDomContentLoaded` nas condições temporizadas; ele pode ser maior que o programado por variação natural do agendador de tarefas e do carregamento da página, e não deve ser tratado como valor exato.
+`atrasoProgramado`, exposto em `window.experimento`, é o atraso usado no agendamento, em milissegundos; permanece `null` na condição `imediata`, pois não há agendamento, e em configuração inválida. O valor configurado para a condição `imediata` continua disponível em `configuracao.atraso` (0). O tempo efetivamente observado é obtido por `instanteInsercao - instanteDomContentLoaded` nas condições temporizadas; ele pode ser maior que o programado por variação natural do agendador de tarefas e do carregamento da página, e não deve ser tratado como valor exato.
 
 A condição `variavel` não sorteia valores nem define uma sequência experimental: depende de uma sequência externa de atrasos fornecida pela automação. Os valores atuais são configurações iniciais e poderão ser ajustados no planejamento ou no piloto futuro.
 
@@ -218,13 +236,15 @@ window.experimento = {
 | --- | --- |
 | `configuracao` | configuração normalizada e validada (`tipo`, `versao`, `carga`, `atraso`); `null` em caso de validação inválida |
 | `estado` | espelha o `data-estado` de `#cenario` |
-| `atrasoProgramado` | atraso efetivamente programado em ms; `null` quando não há agendamento |
+| `atrasoProgramado` | atraso usado no agendamento em ms; `null` na condição `imediata` (sem agendamento) e em configuração inválida |
 | `instanteDomContentLoaded` | instante de `DOMContentLoaded` |
 | `instanteInsercao` | instante em que o componente foi inserido no DOM |
 | `instanteProntidao` | instante em que o componente ficou disponível para análise e o estado passou a `pronto` |
 | `erro` | mensagem de erro quando o estado é `erro`; caso contrário, `null` |
 
 Todos os instantes usam `performance.now()` e são relativos ao início da navegação. Campos ainda não disponíveis permanecem `null`. Na condição imediata, `instanteInsercao` pode ser anterior a `instanteDomContentLoaded`; nos componentes sem recurso assíncrono, `instanteProntidao` também pode anteceder `DOMContentLoaded`.
+
+A resolução de `performance.now()` pode fazer dois instantes muito próximos coincidirem numericamente. Na condição `imediata`, a ordem é garantida pela execução síncrona do script `defer` antes de `DOMContentLoaded`, não pela desigualdade numérica entre os dois campos.
 
 A aplicação não registra resultados de detecção de acessibilidade. As estratégias S1, S2 e S3 pertencem aos futuros scripts de teste.
 
@@ -237,6 +257,17 @@ A aplicação não registra resultados de detecção de acessibilidade. As estra
 - Resultados, métricas ou alegações de detecção de acessibilidade.
 - Pesquisa real, compartilhamento real ou navegação automática para fora da página. Os links de fonte só navegam quando acionados pelo usuário, na mesma aba.
 - Backend, banco de dados, framework, TypeScript, etapa de build, bibliotecas externas, fontes remotas, analytics, CDN ou outros recursos remotos; a aplicação usa HTML, CSS e JavaScript puros e somente recursos locais.
+
+### 9.1 Decisões metodológicas pendentes
+
+As decisões abaixo não estão definidas nesta etapa e não devem ser tratadas como parâmetros finais. A aplicação apenas disponibiliza os cenários e o contrato de observação; não escolhe nem implementa esses valores.
+
+- Definição operacional de S1, S2 e S3: quando exatamente a ferramenta é executada em cada estratégia.
+- Valor da espera fixa de S2 e sua relação com o `atraso` da condição de carga.
+- Sequência de atrasos da condição `variavel`, número de repetições e ordem das execuções.
+- Configuração de axe-core, QualWeb e Playwright, incluindo escopo de regras, limites de espera e tratamento de timeout.
+- Métricas de detecção (por tipo, por regra e por critério) e de custo (tempo total, tempo até a análise e número de execuções).
+- Critérios de inclusão ou exclusão de execuções e forma de registro dos resultados.
 
 ## 10. Registro da mudança editorial
 

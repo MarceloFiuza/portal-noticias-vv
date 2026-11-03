@@ -4,6 +4,16 @@ Aplicação web experimental do trabalho da disciplina de Verificação e Valida
 
 Os cinco cenários estão implementados: **imagem**, **campo**, **botao**, **contraste** e **link**, cada um nas versões `defeito` e `corrigida`. A integração com axe-core, QualWeb e Playwright ainda **não** foi realizada; a capacidade de detecção dessas ferramentas será avaliada no estudo-piloto.
 
+## Questões de pesquisa
+
+O trabalho é orientado por três questões do enunciado:
+
+- **RQ1**: como o momento de execução dos testes influencia a detecção de defeitos de acessibilidade em aplicações web dinâmicas?
+- **RQ2**: quais tipos de violações de acessibilidade são mais afetados pelo momento de execução?
+- **RQ3**: como diferentes estratégias de execução influenciam a detecção de defeitos e o custo de execução?
+
+A aplicação oferece os cinco tipos de violação, as três condições de carga e os instantes de inserção e prontidão necessários para observar essas questões. A definição operacional das estratégias e as métricas permanecem pendentes (`SPEC.md` §9.1).
+
 ## Conteúdo editorial e fontes
 
 O conteúdo de apoio da página é uma **adaptação educativa** de publicações reais sobre acessibilidade. Os textos são paráfrases produzidas para este trabalho; não são reportagens originais das pessoas responsáveis pela aplicação e não representam os veículos ou órgãos citados. Cada notícia exibe título, resumo, crédito e um link para a fonte.
@@ -26,7 +36,7 @@ Os endereços das fontes são apenas links de navegação, abertos na mesma aba 
 - npm `10.9.9`
 - `http-server` `14.1.1` (dependência de desenvolvimento com versão fixada)
 
-A verificação funcional das 30 combinações foi realizada no Google Chrome `156` em modo headless, limitada a funcionamento, presença do defeito ou da correção, prontidão e ausência de erros JavaScript. A aplicação em si não exige navegador específico além de um navegador moderno com suporte a `URLSearchParams`, `performance.now()` e `DOMContentLoaded`.
+A verificação funcional das 30 combinações foi realizada no Google Chrome `156` em modo headless, limitada a funcionamento, presença do defeito ou da correção, prontidão e ausência de erros JavaScript. Nesta revisão, o mesmo procedimento foi reexecutado e complementado com validação de URL, consistência entre DOM e `window.experimento`, cache, falha, timeout e callback tardio da imagem. Nenhuma avaliação de conformidade por ferramenta automatizada foi executada. A aplicação em si não exige navegador específico além de um navegador moderno com suporte a `URLSearchParams`, `performance.now()` e `DOMContentLoaded`.
 
 ## Instalação e execução
 
@@ -72,7 +82,7 @@ Regras principais:
 | `fixa` | evento `DOMContentLoaded` | padrão `2000` ms; explicitamente `0` a `10000` ms | inserção agendada a partir do evento |
 | `variavel` | evento `DOMContentLoaded` | obrigatório, `0` a `10000` ms | mesmo agendamento; o valor de cada execução vem de uma sequência externa |
 
-O `atrasoProgramado`, exposto em `window.experimento`, é o valor configurado, não uma medição. O tempo efetivamente observado nas condições temporizadas é aproximadamente `instanteInsercao - instanteDomContentLoaded` e pode ser maior que o programado por variação natural do agendador de tarefas e do carregamento.
+O `atrasoProgramado`, exposto em `window.experimento`, é o atraso usado no agendamento, não uma medição; é `null` na condição `imediata`, pois não há agendamento. O valor configurado para `imediata` continua em `configuracao.atraso` (0). O tempo efetivamente observado nas condições temporizadas é aproximadamente `instanteInsercao - instanteDomContentLoaded` e pode ser maior que o programado por variação natural do agendador de tarefas e do carregamento.
 
 Modelo de URL para qualquer tipo, versão e condição:
 
@@ -96,6 +106,18 @@ Relações de contraste do componente `contraste`:
 - `#333333` sobre `#ffffff`: **12,6347:1** (acima de 4,5:1).
 
 Os ícones de `botao` e `link` são SVG inline locais, decorativos e marcados com `aria-hidden="true"` e `focusable="false"` nas duas versões.
+
+### Critérios WCAG 2.2
+
+Cada defeito intencional corresponde a critérios da WCAG 2.2:
+
+- `imagem`: 1.1.1 Non-text Content (A).
+- `campo`: 4.1.2 Name, Role, Value (A) e 1.3.1 Info and Relationships (A).
+- `botao`: 4.1.2 Name, Role, Value (A).
+- `contraste`: 1.4.3 Contrast (Minimum) (AA).
+- `link`: 4.1.2 Name, Role, Value (A) e 2.4.4 Link Purpose (In Context) (A).
+
+O mapeamento completo, com as regras ACT relacionadas e as fontes oficiais, está em `SPEC.md` §5.7. Critérios WCAG não são equivalentes a regras de axe-core ou QualWeb: a correspondência de regras e a detecção efetiva não foram avaliadas nesta etapa. A estrutura de apoio usa indicador de foco com contraste de pelo menos 3:1 sobre o fundo branco (WCAG 2.2 1.4.11); isso não altera os defeitos intencionais.
 
 ### Mudança editorial desta etapa
 
@@ -191,6 +213,8 @@ A automação deve observar a região `#cenario` e/ou `window.experimento`.
 
 Os instantes usam `performance.now()` e são relativos ao início da navegação. Na condição imediata, a inserção ocorre antes de `DOMContentLoaded`. Para `campo`, `botao`, `contraste` e `link`, a prontidão é registrada logo após a inserção e a preparação do elemento, pois não há recurso assíncrono próprio. Para a imagem, a prontidão aguarda o carregamento com sucesso, inclusive no caso de cache.
 
+A resolução de `performance.now()` pode fazer instantes muito próximos coincidirem numericamente. Na condição `imediata`, a ordem é garantida pela execução síncrona do script `defer` antes de `DOMContentLoaded`, não pela desigualdade entre os valores registrados.
+
 Uma vez em `erro`, callbacks tardios não alteram o estado para `pronto`; por exemplo, uma imagem que carregue após o timeout permanece no estado de erro.
 
 O limite para falha de carregamento da imagem é de **15000 ms**, contado a partir da inserção. Ele evita que o cenário permaneça indefinidamente em `carregando`.
@@ -229,14 +253,25 @@ Também é possível conferir o estado diretamente no DOM com `document.querySel
     └── noticia.svg
 ```
 
+O arquivo local `orientacoes-trabalho.pdf` é a referência do enunciado, não faz parte do código entregue e está no `.gitignore`.
+
+## Decisões metodológicas pendentes
+
+As decisões operacionais de S1, S2 e S3, o valor da espera fixa, a sequência de atrasos variáveis, as repetições e a ordem, as configurações das ferramentas e as métricas de detecção e custo ainda não estão definidas. Elas pertencem ao planejamento e ao estudo-piloto, não são defeitos desta preparação e estão detalhadas em `SPEC.md` §9.1.
+
 ## Limitações e próximos passos
 
 - Os cinco tipos estão implementados, mas nenhuma ferramenta de acessibilidade foi integrada. Nenhum resultado de detecção foi medido ou registrado.
 - Axe-core, QualWeb e Playwright não estão integrados; a capacidade de detecção das ferramentas será avaliada no estudo-piloto.
-- **Nenhuma análise automatizada de acessibilidade foi realizada nesta etapa.** Inspeções funcionais de DOM e de estado não substituem uma avaliação de acessibilidade.
-- A sequência de atrasos da condição variável ainda será definida pela automação.
-- Os valores de atraso são iniciais e podem mudar após o estudo-piloto.
-- As estratégias S1, S2 e S3 serão implementadas nos futuros scripts de teste, não nesta aplicação.
+- **Nenhuma avaliação de conformidade por ferramenta automatizada (axe-core, QualWeb etc.) foi realizada nesta etapa.** Inspeções funcionais de DOM, estado e nomes acessíveis no navegador não substituem uma avaliação de acessibilidade.
 - O conteúdo de apoio é composto por adaptações educativas de publicações reais, com créditos e fontes identificados. Nenhum resultado de detecção foi medido com esse conteúdo.
 - Não há pesquisa real nem compartilhamento real. Os links de fonte levam a páginas externas apenas quando acionados pelo usuário; não há carregamento automático de recursos externos.
 - Próximo incremento recomendado: realizar o estudo-piloto de detecção com os componentes já disponíveis, avaliando as ferramentas e as estratégias de espera sem antecipar resultados científicos.
+
+### Entregas futuras do trabalho
+
+- Estudo-piloto com as ferramentas e as estratégias de execução.
+- Implementação das três estratégias de execução nos scripts de automação.
+- Coleta, organização e análise dos dados experimentais.
+- Artigo científico no template ACM, com 9 a 10 páginas.
+- Submissão do artigo em PDF e das fontes LaTeX, acompanhada de código, scripts e dados.

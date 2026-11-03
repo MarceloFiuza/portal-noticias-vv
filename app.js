@@ -94,8 +94,11 @@
   }
 
   experimento.configuracao = { ...configuracao };
-  // atrasoProgramado é o valor configurado, não o tempo efetivamente observado.
-  experimento.atrasoProgramado = configuracao.atraso;
+  // atrasoProgramado é o atraso do agendamento, não o tempo efetivamente
+  // observado. Na condição imediata não há agendamento, então o campo
+  // permanece null; o valor configurado para a execução continua em
+  // configuracao.atraso (0).
+  experimento.atrasoProgramado = configuracao.carga === "imediata" ? null : configuracao.atraso;
 
   // Condição imediata: a inserção ocorre durante a inicialização, antes de DOMContentLoaded.
   if (configuracao.carga === "imediata") {

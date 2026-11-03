@@ -13,3 +13,6 @@ npm-debug.log*
 # Arquivos do sistema
 .DS_Store
 Thumbs.db
+
+# Referência local do enunciado (não faz parte do código entregue)
+/orientacoes-trabalho.pdf
