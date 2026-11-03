@@ -76,6 +76,12 @@ main {
   padding-block: 2rem;
 }
 
+.observacao {
+  margin: 0 0 1.5rem;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
 .noticia,
 .cenario {
   background-color: var(--superficie);
@@ -86,6 +92,10 @@ main {
 
 .noticia {
   padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.noticia + .noticia {
+  margin-top: 1.5rem;
 }
 
 .noticia h2 {
@@ -104,11 +114,25 @@ main {
   text-transform: uppercase;
 }
 
-.linha-fina {
+.resumo {
   margin: 0 0 1rem;
   color: var(--texto-suave);
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.credito,
+.fonte {
+  margin: 0.35rem 0 0;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.credito {
+  margin-top: 0.9rem;
+}
+
+.noticia a {
+  color: var(--destaque);
 }
 
 .noticia p:last-child,

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Portal de notícias fictício usado em um estudo experimental de verificação e validação de acessibilidade.">
+  <meta name="description" content="Portal experimental acadêmico com adaptações educativas de publicações sobre acessibilidade, usado em um estudo de verificação e validação de software.">
   <title>Portal de Notícias Experimental</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
@@ -15,17 +15,36 @@
     <div class="container">
       <p class="rotulo rotulo-claro">Verificação e Validação de Software</p>
       <h1>Portal de Notícias Experimental</h1>
-      <p class="subtitulo">Conteúdo fictício para o estudo do momento de execução de testes automatizados de acessibilidade.</p>
+      <p class="subtitulo">Conteúdo educativo adaptado de publicações sobre acessibilidade para o estudo do momento de execução de testes automatizados.</p>
     </div>
   </header>
 
   <main id="conteudo" class="container">
+    <p class="observacao">Portal experimental acadêmico. Conteúdos adaptados de fontes identificadas; não representa os veículos ou órgãos citados.</p>
+
+    <article class="noticia" aria-labelledby="titulo-noticia-ia">
+      <p class="editoria">Acessibilidade</p>
+      <h2 id="titulo-noticia-ia">IA pode apoiar o desenvolvimento de interfaces mais inclusivas</h2>
+      <p class="resumo">Uma publicação do Laboratório de Inovação Goiás discute aplicações de inteligência artificial na acessibilidade, como legendas automáticas, descrições de imagens e adaptações de interface. O texto destaca a importância da autonomia dos usuários e da participação de pessoas com deficiência na validação das soluções.</p>
+      <p class="credito">Adaptação educativa de artigo de Tatiane Marinho, publicado pelo Laboratório de Inovação Goiás — LIGO em 12/12/2025.</p>
+      <p class="fonte">Fonte: <a href="https://goias.gov.br/ligo/inteligencia-artificial-e-acessibilidade-em-ux-caminhos-para-interfaces-digitais-mais-inclusivas/">Ler o artigo original no site do Laboratório de Inovação Goiás (LIGO)</a></p>
+    </article>
+
+    <article class="noticia" aria-labelledby="titulo-noticia-govbr">
+      <p class="editoria">Acessibilidade</p>
+      <h2 id="titulo-noticia-govbr">Atualização do GOV.BR busca facilitar o uso por pessoas com deficiência</h2>
+      <p class="resumo">Segundo notícia publicada pelo Metrô News, atribuída à Agência Brasil, uma atualização do aplicativo GOV.BR trouxe melhorias para pessoas com deficiência que possuem a Carteira de Identidade Nacional. A publicação menciona facilidades no uso com leitores de tela e na atualização de dados de contato.</p>
+      <p class="credito">Adaptação educativa de notícia publicada pelo Metrô News em 11/11/2025, com crédito à Agência Brasil.</p>
+      <p class="fonte">Fonte consultada: <a href="https://metronews.com.br/atualizacao-do-app-gov-br-melhora-acessibilidade-para-pessoas-com-deficiencia/">Ler a notícia original no site do Metrô News</a></p>
+    </article>
+
+    <!-- Identificador mantido por compatibilidade com o destino do link experimental. -->
     <article id="noticia-corredor-verde" class="noticia" aria-labelledby="titulo-noticia">
-      <p class="editoria">Cidades</p>
-      <h2 id="titulo-noticia">Bairro ganha novo corredor verde e amplia áreas de convivência</h2>
-      <p class="linha-fina">Projeto fictício prevê calçadas arborizadas, pequenas praças e novas ligações entre ruas do centro.</p>
-      <p>Moradores acompanharam nesta semana a primeira etapa de um projeto urbano imaginário que transforma antigas vagas de estacionamento em espaços de convivência. A proposta combina árvores, bancos e sinalização para pedestres.</p>
-      <p>Segundo a reportagem fictícia, a intervenção seria acompanhada por um levantamento das rotas mais usadas e por conversas com comerciantes e frequentadores do bairro.</p>
+      <p class="editoria">Acessibilidade</p>
+      <h2 id="titulo-noticia">TSE apresenta mudanças na interface da urna para ampliar a acessibilidade</h2>
+      <p class="resumo">O Tribunal Superior Eleitoral apresentou mudanças na interface da urna eletrônica para as Eleições 2026. Entre os recursos descritos estão uma fonte voltada à legibilidade, telas reorganizadas, indicação do progresso da votação e ampliação das orientações em Libras.</p>
+      <p class="credito">Adaptação educativa de notícia do Tribunal Superior Eleitoral — TSE, publicada em 08/08/2026 e atualizada em 08/10/2026.</p>
+      <p class="fonte">Fonte: <a href="https://www.tse.jus.br/comunicacao/noticias/2026/Agosto/urna-eletronica-ganha-nova-interface-para-tornar-votacao-mais-acessivel-e-intuitiva">Ler a notícia original no site do Tribunal Superior Eleitoral (TSE)</a></p>
     </article>
 
     <section id="cenario" class="cenario" data-estado="carregando" aria-labelledby="titulo-cenario">
@@ -40,7 +59,7 @@
   <footer class="rodape">
     <div class="container">
       <p>Portal de Notícias Experimental — projeto acadêmico da disciplina de Verificação e Validação de Software.</p>
-      <p>Todo o conteúdo desta página é fictício.</p>
+      <p>Textos adaptados para uso educativo; a autoria e o crédito das publicações originais são dos veículos e órgãos citados. A ilustração do cenário de imagem é um recurso próprio do projeto.</p>
     </div>
   </footer>
 </body>

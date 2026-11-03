@@ -7,7 +7,7 @@
   const PARAMETROS_RECONHECIDOS = ["tipo", "versao", "carga", "atraso"];
 
   const CAMINHO_IMAGEM = "assets/noticia.svg";
-  const ALT_IMAGEM = "Ilustração de um jornal aberto sobre uma mesa, com manchete e blocos de texto; ao fundo, prédios, uma árvore e o sol.";
+  const ALT_IMAGEM = "Ilustração de uma janela de navegador com barra superior, menu lateral de ícones e área de conteúdo com títulos, um botão de alternância, um botão com símbolo de acessibilidade, outro botão e um ponteiro de mouse.";
   const ATRASO_MAXIMO_MS = 10000;
   const ATRASO_PADRAO_FIXA_MS = 2000;
   const LIMITE_CARREGAMENTO_MS = 15000;
@@ -251,7 +251,7 @@
     const texto = document.createElement("p");
     texto.id = "texto-contraste";
     texto.className = `texto-contraste texto-contraste--${versao}`;
-    texto.textContent = "A biblioteca municipal terá horário estendido a partir da próxima semana para receber o novo acervo de livros e periódicos.";
+    texto.textContent = "Uma publicação do Laboratório de Inovação Goiás discute aplicações de inteligência artificial na acessibilidade, como legendas automáticas, descrições de imagens e adaptações de interface. O texto destaca a importância da autonomia dos usuários e da participação de pessoas com deficiência na validação das soluções.";
     return texto;
   }
 
@@ -259,10 +259,11 @@
     const link = document.createElement("a");
     link.id = "link-noticia";
     link.className = "link-icone";
+    // O identificador do destino foi mantido por compatibilidade com a etapa anterior.
     link.href = "#noticia-corredor-verde";
 
     if (versao === "corrigida") {
-      link.setAttribute("aria-label", "Ler notícia sobre o corredor verde");
+      link.setAttribute("aria-label", "Ler notícia sobre acessibilidade na urna eletrônica");
     }
 
     link.append(criarIconeNoticia());

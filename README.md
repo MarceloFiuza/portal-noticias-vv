@@ -4,6 +4,22 @@ Aplicação web experimental do trabalho da disciplina de Verificação e Valida
 
 Os cinco cenários estão implementados: **imagem**, **campo**, **botao**, **contraste** e **link**, cada um nas versões `defeito` e `corrigida`. A integração com axe-core, QualWeb e Playwright ainda **não** foi realizada; a capacidade de detecção dessas ferramentas será avaliada no estudo-piloto.
 
+## Conteúdo editorial e fontes
+
+O conteúdo de apoio da página é uma **adaptação educativa** de publicações reais sobre acessibilidade. Os textos são paráfrases produzidas para este trabalho; não são reportagens originais das pessoas responsáveis pela aplicação e não representam os veículos ou órgãos citados. Cada notícia exibe título, resumo, crédito e um link para a fonte.
+
+| Título usado na adaptação | Autoria ou instituição | Data | Fonte |
+| --- | --- | --- | --- |
+| IA pode apoiar o desenvolvimento de interfaces mais inclusivas | Tatiane Marinho — Laboratório de Inovação Goiás (LIGO) | 12/12/2025 | <https://goias.gov.br/ligo/inteligencia-artificial-e-acessibilidade-em-ux-caminhos-para-interfaces-digitais-mais-inclusivas/> |
+| Atualização do GOV.BR busca facilitar o uso por pessoas com deficiência | Metrô News, com crédito à Agência Brasil | 11/11/2025 | <https://metronews.com.br/atualizacao-do-app-gov-br-melhora-acessibilidade-para-pessoas-com-deficiencia/> |
+| TSE apresenta mudanças na interface da urna para ampliar a acessibilidade | Tribunal Superior Eleitoral (TSE) | publicada em 08/08/2026 e atualizada em 08/10/2026 | <https://www.tse.jus.br/comunicacao/noticias/2026/Agosto/urna-eletronica-ganha-nova-interface-para-tornar-votacao-mais-acessivel-e-intuitiva> |
+
+Os dados editoriais foram fornecidos integralmente no pedido. **As páginas de origem não foram acessadas nesta execução**, portanto não há data de consulta registrada e os títulos originais não puderam ser conferidos; os títulos acima são os utilizados nas adaptações.
+
+A autoria da aplicação — código, desenho experimental, textos de apoio e a ilustração local `assets/noticia.svg` — pertence ao projeto acadêmico da disciplina de Verificação e Validação de Software. A autoria e a responsabilidade pelas informações jornalísticas são dos veículos, órgãos e pessoas citados. A ilustração é um recurso próprio do projeto e não reproduz fotografias, logotipos ou imagens das fontes.
+
+Os endereços das fontes são apenas links de navegação, abertos na mesma aba quando acionados. A aplicação não faz `fetch`, `iframe`, `prefetch`, `prerender`, nem carregamento automático de recursos externos.
+
 ## Requisitos utilizados
 
 - Node.js `v22.23.3`
@@ -72,7 +88,7 @@ http://localhost:3000/?tipo=<tipo>&versao=<versao>&carga=<condicao>[&atraso=<ms>
 | `campo` | campo sem nome acessível | campo com `label` visível associado |
 | `botao` | botão com ícone sem nome acessível | mesmo botão com `aria-label="Compartilhar notícia"` |
 | `contraste` | texto `#aaaaaa` sobre branco | texto `#333333` sobre branco |
-| `link` | link com ícone sem nome acessível | mesmo link com `aria-label` descritivo |
+| `link` | link com ícone sem nome acessível | mesmo link com `aria-label="Ler notícia sobre acessibilidade na urna eletrônica"` |
 
 Relações de contraste do componente `contraste`:
 
@@ -80,6 +96,14 @@ Relações de contraste do componente `contraste`:
 - `#333333` sobre `#ffffff`: **12,6347:1** (acima de 4,5:1).
 
 Os ícones de `botao` e `link` são SVG inline locais, decorativos e marcados com `aria-hidden="true"` e `focusable="false"` nas duas versões.
+
+### Mudança editorial desta etapa
+
+- O texto do componente `contraste` passou a ser o resumo da notícia sobre inteligência artificial e acessibilidade (notícia 1), mantendo-se idêntico nas versões `defeito` e `corrigida`.
+- O `alt` da versão corrigida de `imagem` foi atualizado para descrever a nova ilustração de interface digital acessível.
+- O nome acessível da versão corrigida de `link` passou a ser “Ler notícia sobre acessibilidade na urna eletrônica”.
+- O destino local `#noticia-corredor-verde` foi mantido por compatibilidade com a etapa anterior; apenas o conteúdo e o nome acessível do link foram atualizados.
+- Nenhum resultado de temporização ou de detecção de acessibilidade havia sido registrado com o conteúdo anterior. Os tempos e resultados de etapas futuras deverão corresponder a esta nova versão do conteúdo.
 
 As cinco opções de `tipo`, duas de `versao` e três de `carga` resultam nas **30 combinações disponíveis** da aplicação: 5 × 2 × 3. Elas são configurações da aplicação; estratégias de teste, repetições, ferramentas e coleta de resultados serão definidas separadamente. A disponibilidade das combinações não comprova detecção de violações por ferramenta alguma.
 
@@ -214,5 +238,6 @@ Também é possível conferir o estado diretamente no DOM com `document.querySel
 - A sequência de atrasos da condição variável ainda será definida pela automação.
 - Os valores de atraso são iniciais e podem mudar após o estudo-piloto.
 - As estratégias S1, S2 e S3 serão implementadas nos futuros scripts de teste, não nesta aplicação.
-- Não há pesquisa real, compartilhamento real ou navegação para fora da página.
+- O conteúdo de apoio é composto por adaptações educativas de publicações reais, com créditos e fontes identificados. Nenhum resultado de detecção foi medido com esse conteúdo.
+- Não há pesquisa real nem compartilhamento real. Os links de fonte levam a páginas externas apenas quando acionados pelo usuário; não há carregamento automático de recursos externos.
 - Próximo incremento recomendado: realizar o estudo-piloto de detecção com os componentes já disponíveis, avaliando as ferramentas e as estratégias de espera sem antecipar resultados científicos.

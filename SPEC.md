@@ -40,12 +40,29 @@ A página deve:
 - conter um único `h1`;
 - conter conteúdo principal e rodapé;
 - conter a região experimental com `id="cenario"`;
-- usar conteúdo fictício, CSS local e recursos locais;
+- usar conteúdo educativo adaptado de publicações identificadas, com créditos e fontes, além de CSS local e recursos locais;
+- identificar o caráter experimental e a origem adaptada do conteúdo em uma observação visível;
 - manter a estrutura e o conteúdo de apoio iguais entre as versões e entre os tipos;
 - apresentar somente o componente correspondente ao parâmetro `tipo` dentro de `#componente`;
 - não conter painel de configuração: os cenários são selecionados pela URL.
 
 A página básica deve evitar violações adicionais conhecidas, usando HTML semântico, hierarquia de títulos, contraste adequado no conteúdo de apoio e landmarks.
+
+### 3.1 Conteúdo editorial
+
+O conteúdo de apoio é composto por adaptações educativas de três publicações sobre acessibilidade. Os textos são paráfrases, não transcrições, e não representam os veículos ou órgãos citados.
+
+| Conteúdo | Título usado na adaptação | Crédito | Origem |
+| --- | --- | --- | --- |
+| Notícia 1 | IA pode apoiar o desenvolvimento de interfaces mais inclusivas | Tatiane Marinho — Laboratório de Inovação Goiás (LIGO), 12/12/2025 | `goias.gov.br/ligo/` |
+| Notícia 2 | Atualização do GOV.BR busca facilitar o uso por pessoas com deficiência | Metrô News, com crédito à Agência Brasil, 11/11/2025 | `metronews.com.br` |
+| Notícia 3 | TSE apresenta mudanças na interface da urna para ampliar a acessibilidade | Tribunal Superior Eleitoral (TSE), publicada em 08/08/2026 e atualizada em 08/10/2026 | `tse.jus.br` |
+
+Cada notícia exibe título, resumo, crédito e um link descritivo para a fonte. Os créditos ficam fora de `#componente` e não são associados por `label`, `aria-label` ou `aria-labelledby` aos elementos experimentais, para não lhes fornecer nome acessível acidental.
+
+As notícias e atribuições estão armazenadas no próprio HTML/JavaScript. A aplicação não faz `fetch`, `iframe`, `prefetch` ou `prerender`; os endereços das fontes são apenas links de navegação, preferencialmente na mesma aba.
+
+A ilustração `assets/noticia.svg` é um recurso próprio do projeto, identificado como ilustração, e não reproduz fotografias, logotipos ou imagens das fontes.
 
 ## 4. Parâmetros de URL
 
@@ -81,7 +98,7 @@ Configurações inválidas resultam em estado `erro`, sem inserir o componente. 
 
 ## 5. Componentes implementados
 
-Todos os componentes usam conteúdo fictício de um portal de notícias. Apenas o componente solicitado é inserido em `#componente`; os demais não são criados.
+Todos os componentes usam o conteúdo educativo adaptado descrito na seção 3.1. Apenas o componente solicitado é inserido em `#componente`; os demais não são criados.
 
 ### 5.1 `imagem`
 
@@ -91,7 +108,7 @@ Todos os componentes usam conteúdo fictício de um portal de notícias. Apenas 
 
 Texto alternativo usado na versão corrigida:
 
-> Ilustração de um jornal aberto sobre uma mesa, com manchete e blocos de texto; ao fundo, prédios, uma árvore e o sol.
+> Ilustração de uma janela de navegador com barra superior, menu lateral de ícones e área de conteúdo com títulos, um botão de alternância, um botão com símbolo de acessibilidade, outro botão e um ponteiro de mouse.
 
 A imagem é o único componente com recurso assíncrono próprio. Seu carregamento, cache, falha e limite de tempo são tratados conforme a seção 7.
 
@@ -113,11 +130,13 @@ A imagem é o único componente com recurso assíncrono próprio. Seu carregamen
 
 ### 5.4 `contraste`
 
-- Estrutura: `p#texto-contraste` com um resumo curto de notícia.
+- Estrutura: `p#texto-contraste` com o resumo da notícia 1 (inteligência artificial e acessibilidade).
 - Texto, posição, tamanho de `16px`, peso `400`, fundo branco sólido e `line-height` são iguais nas duas versões. O fundo não usa transparência, gradiente ou imagem.
 - **`defeito`**: cor do texto `#aaaaaa` sobre `#ffffff`, relação de contraste de aproximadamente **2,32:1**, abaixo de `4,5:1`.
 - **`corrigida`**: cor do texto `#333333` sobre `#ffffff`, relação de contraste de aproximadamente **12,63:1**, acima de `4,5:1`.
 - A alteração de cor atinge somente `#texto-contraste`; nenhuma outra parte da página muda entre as versões.
+- O crédito da fonte permanece em um elemento separado do componente, com contraste adequado.
+- O texto do componente foi alterado nesta etapa: passou a ser o resumo da notícia 1. Os tempos e resultados de etapas futuras deverão corresponder a esta versão do conteúdo.
 
 Cálculo pelas luminâncias relativas das cores:
 
@@ -127,10 +146,11 @@ Cálculo pelas luminâncias relativas das cores:
 ### 5.5 `link`
 
 - Estrutura: `a#link-noticia` com ícone SVG inline local.
-- Destino local válido: `#noticia-corredor-verde`, âncora do artigo fictício presente na página.
+- Destino local válido: `#noticia-corredor-verde`, âncora do artigo sobre a urna eletrônica presente na página. O identificador foi mantido por compatibilidade com a etapa anterior; apenas o conteúdo do destino foi atualizado.
 - O ícone tem `aria-hidden="true"` e `focusable="false"`, sem `title` ou `desc`, para ser decorativo nas duas versões. Não há imagem sem `alt` dentro do link.
 - **`defeito`**: link sem `aria-label`, `title`, texto visível ou conteúdo oculto que forneça nome.
-- **`corrigida`**: mesmo link com `aria-label="Ler notícia sobre o corredor verde"`.
+- **`corrigida`**: mesmo link com `aria-label="Ler notícia sobre acessibilidade na urna eletrônica"`.
+- O link externo da fonte fica separado do link experimental, no bloco editorial de apoio.
 
 ### 5.6 Identificadores, violações, correções e prontidão
 
@@ -140,9 +160,9 @@ Cálculo pelas luminâncias relativas das cores:
 | `campo` | `#campo-busca` (`input`); rótulo `#rotulo-campo-busca` | texto visível em `span` não associado; `input` sem nome acessível | `label[for="campo-busca"]` com o mesmo texto visível | imediatamente após a inserção e a aplicação das classes |
 | `botao` | `#botao-compartilhar` (`button`) | SVG decorativo sem nome acessível; botão sem nome | mesmo botão com `aria-label="Compartilhar notícia"` | imediatamente após a inserção e a aplicação dos atributos |
 | `contraste` | `#texto-contraste` (`p`) | texto `#aaaaaa` sobre `#ffffff` (2,3231:1) | mesmo texto em `#333333` sobre `#ffffff` (12,6347:1) | imediatamente após a inserção e a aplicação da classe de cor |
-| `link` | `#link-noticia` (`a`) | SVG decorativo sem nome acessível; link sem nome | mesmo link com `aria-label="Ler notícia sobre o corredor verde"` | imediatamente após a inserção e a aplicação do atributo |
+| `link` | `#link-noticia` (`a`) | SVG decorativo sem nome acessível; link sem nome | mesmo link com `aria-label="Ler notícia sobre acessibilidade na urna eletrônica"` | imediatamente após a inserção e a aplicação do atributo |
 
-O link aponta para o destino local estável `#noticia-corredor-verde`. Também são estáveis `#cenario`, `#componente` e `#mensagem-estado`.
+O link aponta para o destino local estável `#noticia-corredor-verde`, identificador mantido por compatibilidade e associado ao artigo sobre a urna eletrônica. Também são estáveis `#cenario`, `#componente` e `#mensagem-estado`.
 
 ## 6. Condições de carregamento
 
@@ -215,5 +235,13 @@ A aplicação não registra resultados de detecção de acessibilidade. As estra
 - Sorteio ou sequência automática de atrasos.
 - Painel de configuração.
 - Resultados, métricas ou alegações de detecção de acessibilidade.
-- Pesquisa real, compartilhamento real ou navegação para fora da página.
+- Pesquisa real, compartilhamento real ou navegação automática para fora da página. Os links de fonte só navegam quando acionados pelo usuário, na mesma aba.
 - Backend, banco de dados, framework, TypeScript ou build.
+
+## 10. Registro da mudança editorial
+
+- O conteúdo de apoio foi substituído por adaptações educativas de três publicações sobre acessibilidade, com créditos e fontes identificados.
+- A mudança atinge títulos, resumos, créditos, o texto do componente `contraste`, o `alt` da imagem corrigida e o nome acessível do link corrigido.
+- A ilustração local `assets/noticia.svg` foi refeita como uma interface digital acessível. Ela é um recurso do projeto e não reproduz imagens das fontes.
+- O contrato experimental foi preservado: parâmetros de URL, 30 combinações, estados `carregando`, `pronto` e `erro`, `window.experimento`, marcos de temporização, tratamento de cache, erro e timeout da imagem e proteção contra callbacks tardios.
+- Nenhum resultado de temporização ou de detecção de acessibilidade havia sido registrado com o conteúdo anterior. Tempos e resultados de etapas futuras deverão corresponder a esta versão do conteúdo.
