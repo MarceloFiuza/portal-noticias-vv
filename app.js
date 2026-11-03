@@ -1,6 +1,21 @@
 "use strict";
 
+/*
+ * Portal de Notícias Experimental — aplicação do estudo de Verificação e
+ * Validação de Software.
+ *
+ * A URL seleciona um cenário desta mesma aplicação (tipo, versão e condição de
+ * carga); não são aplicações diferentes. Cada execução insere somente um
+ * componente em #componente, de acordo com o parâmetro "tipo".
+ *
+ * Os cinco defeitos são intencionais e controlados: existem apenas na versão
+ * "defeito" e são o objeto de análise do experimento. Não devem ser corrigidos
+ * indiscriminadamente, pois isso eliminaria a condição comparada. A aplicação
+ * apenas disponibiliza o componente e informa a prontidão; as estratégias S1,
+ * S2 e S3 serão responsabilidade da futura automação, não desta aplicação.
+ */
 (() => {
+  // Listas fechadas de valores aceitos; qualquer outro valor é rejeitado pela validação.
   const TIPOS_VALIDOS = ["imagem", "campo", "botao", "contraste", "link"];
   const VERSOES_VALIDAS = ["defeito", "corrigida"];
   const CARGAS_VALIDAS = ["imediata", "fixa", "variavel"];
@@ -15,6 +30,18 @@
 
   class ErroConfiguracao extends Error {}
 
+  /*
+   * Contrato observável descrito em SPEC.md. A automação consulta este objeto
+   * para saber qual configuração foi aplicada e em que momento o componente
+   * ficou disponível.
+   *
+   * Os instantes usam performance.now(), portanto são relativos ao início da
+   * navegação. Campos de eventos ainda não ocorridos permanecem null.
+   *
+   * Estados: "carregando" indica componente ainda não inserido ou imagem ainda
+   * não concluída; "pronto" indica disponível para análise; "erro" indica
+   * configuração inválida, falha da imagem ou estouro do limite de carga.
+   */
   const experimento = {
     configuracao: null,
     estado: "carregando",
@@ -33,6 +60,15 @@
 
   let configuracao = null;
 
+  /*
+   * As condições temporizadas (fixa e variavel) contam o atraso a partir do
+   * instante em que este listener registra DOMContentLoaded. O componente da
+   * condição imediata não passa por aqui: ele já foi inserido durante a
+   * inicialização, antes do evento.
+   *
+   * O atraso de "variavel" vem externamente pela URL; a aplicação não sorteia
+   * valores. O atraso é uma condição experimental, não um defeito.
+   */
   document.addEventListener("DOMContentLoaded", () => {
     experimento.instanteDomContentLoaded = performance.now();
 
@@ -58,12 +94,19 @@
   }
 
   experimento.configuracao = { ...configuracao };
+  // atrasoProgramado é o valor configurado, não o tempo efetivamente observado.
   experimento.atrasoProgramado = configuracao.atraso;
 
+  // Condição imediata: a inserção ocorre durante a inicialização, antes de DOMContentLoaded.
   if (configuracao.carga === "imediata") {
     inserirComponente(configuracao);
   }
 
+  /*
+   * A validação rejeita configurações inválidas com mensagem explícita em vez
+   * de aplicar um padrão silencioso: uma troca de valor executaria outro
+   * cenário sem que a automação percebesse.
+   */
   function validarConfiguracao(search) {
     const parametros = new URLSearchParams(search);
 
@@ -170,6 +213,7 @@
   }
 
   function inserirComponente(config) {
+    // Só insere enquanto o estado é carregando; pronto e erro são terminais.
     if (experimento.estado !== "carregando") {
       return;
     }
@@ -210,6 +254,12 @@
     }
   }
 
+  /*
+   * Defeito intencional (versao=defeito): o texto próximo ao campo fica em um
+   * span sem associação com o input, portanto não lhe fornece nome acessível.
+   * Correção (versao=corrigida): o mesmo texto vira um label associado por
+   * "for", mantendo aparência e estrutura equivalentes.
+   */
   function criarCampo(versao) {
     const grupo = document.createElement("div");
     grupo.className = "campo-experimental";
@@ -233,6 +283,11 @@
     return grupo;
   }
 
+  /*
+   * Defeito intencional: o botão contém apenas um ícone decorativo e não recebe
+   * nome acessível. Correção: somente a versão corrigida recebe aria-label,
+   * que informa a finalidade do botão.
+   */
   function criarBotao(versao) {
     const botao = document.createElement("button");
     botao.type = "button";
@@ -247,6 +302,12 @@
     return botao;
   }
 
+  /*
+   * Defeito intencional: a classe --defeito aplica #aaaaaa sobre #ffffff.
+   * Correção: a classe --corrigida aplica #333333 sobre o mesmo fundo branco.
+   * O texto é idêntico nas duas versões; apenas a cor muda, e essa decisão
+   * fica no CSS para não duplicar o conteúdo.
+   */
   function criarContraste(versao) {
     const texto = document.createElement("p");
     texto.id = "texto-contraste";
@@ -255,6 +316,11 @@
     return texto;
   }
 
+  /*
+   * Defeito intencional: o link formado por um ícone decorativo não possui nome
+   * acessível. Correção: somente a versão corrigida recebe aria-label, que
+   * informa o propósito do link. O destino é o mesmo nas duas versões.
+   */
   function criarLink(versao) {
     const link = document.createElement("a");
     link.id = "link-noticia";
@@ -270,6 +336,11 @@
     return link;
   }
 
+  /*
+   * Ícone decorativo compartilhado por botão e link: aria-hidden e focusable
+   * impedem que o SVG forneça nome acessível nas duas versões. Por isso, a
+   * correção do botão e do link depende apenas do aria-label do elemento pai.
+   */
   function criarSvgIcone() {
     const svg = document.createElementNS(SVG_NS, "svg");
     svg.setAttribute("viewBox", "0 0 24 24");
@@ -328,6 +399,14 @@
     return svg;
   }
 
+  /*
+   * Defeito intencional: em versao=defeito a imagem informativa é inserida sem
+   * alt. Correção: em versao=corrigida a mesma imagem recebe o alt descritivo.
+   *
+   * A imagem é o único componente com recurso assíncrono próprio. Por isso a
+   * prontidão aguarda o carregamento bem-sucedido, cobre o caso de cache e pode
+   * terminar em erro por falha do recurso ou por estouro do limite de tempo.
+   */
   function inserirImagem(config) {
     const imagem = document.createElement("img");
     imagem.id = "imagem-noticia";
@@ -342,6 +421,8 @@
     let finalizado = false;
     let limiteId = null;
 
+    // A trava "finalizado" garante uma única transição terminal. Assim, um load
+    // que chegue depois de uma falha ou do timeout não transforma erro em pronto.
     const finalizar = (sucesso, textoErro) => {
       if (finalizado) {
         return;
@@ -377,6 +458,8 @@
     experimento.instanteInsercao = performance.now();
     componente.replaceChildren(imagem);
 
+    // Limite de 15000 ms contado a partir da inserção: evita permanecer
+    // indefinidamente em carregando quando o recurso não conclui.
     limiteId = window.setTimeout(() => {
       finalizar(
         false,
@@ -384,7 +467,9 @@
       );
     }, LIMITE_CARREGAMENTO_MS);
 
-    // Cobre o caso de a imagem já estar disponível no cache.
+    // Cobre o caso de a imagem já estar disponível no cache: complete e
+    // dimensões naturais válidas permitem registrar a prontidão sem esperar
+    // um novo evento de load.
     if (imagem.complete) {
       if (imagem.naturalWidth > 0) {
         finalizar(true);
@@ -400,6 +485,8 @@
       return;
     }
 
+    // "pronto" significa disponível para análise, não aprovado em acessibilidade.
+    // A sinalização é a mesma nas versões defeito e corrigida.
     experimento.estado = "pronto";
     experimento.instanteProntidao = performance.now();
     experimento.erro = null;
@@ -411,6 +498,8 @@
     }
   }
 
+  // Estado terminal de erro: a mensagem fica visível em #mensagem-estado e
+  // também em window.experimento.erro para observação pela automação.
   function definirErro(texto) {
     experimento.estado = "erro";
     experimento.erro = texto;

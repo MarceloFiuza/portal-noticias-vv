@@ -231,6 +231,12 @@ main {
   outline-offset: 3px;
 }
 
+/*
+ * Componente de contraste: o texto, o fundo branco e as dimensões são iguais
+ * nas duas versões. Somente a cor do texto muda, conforme a classe de versão.
+ * As cores experimentais abaixo devem ser preservadas até uma mudança
+ * documentada do cenário; ajustá-las alteraria a condição comparada.
+ */
 .texto-contraste {
   max-width: 46rem;
   margin: 0;
@@ -243,14 +249,17 @@ main {
   line-height: 1.6;
 }
 
+/* Versão defeito: #aaaaaa sobre #ffffff, contraste insuficiente intencional. */
 .texto-contraste--defeito {
   color: #aaaaaa;
 }
 
+/* Versão corrigida: #333333 sobre #ffffff, contraste adequado. */
 .texto-contraste--corrigida {
   color: #333333;
 }
 
+/* Destaque visual do estado terminal de erro; pronto e carregando não alteram o componente. */
 .cenario[data-estado="erro"] {
   border-left-color: var(--erro);
 }

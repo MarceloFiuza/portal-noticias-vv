@@ -20,6 +20,11 @@
   </header>
 
   <main id="conteudo" class="container">
+    <!--
+      Estrutura editorial de apoio: notícias adaptadas, créditos e fontes.
+      Este bloco é igual entre tipos e versões e fica separado do componente
+      avaliado, para não lhe fornecer nome acessível por associação acidental.
+    -->
     <p class="observacao">Portal experimental acadêmico. Conteúdos adaptados de fontes identificadas; não representa os veículos ou órgãos citados.</p>
 
     <article class="noticia" aria-labelledby="titulo-noticia-ia">
@@ -47,6 +52,10 @@
       <p class="fonte">Fonte: <a href="https://www.tse.jus.br/comunicacao/noticias/2026/Agosto/urna-eletronica-ganha-nova-interface-para-tornar-votacao-mais-acessivel-e-intuitiva">Ler a notícia original no site do Tribunal Superior Eleitoral (TSE)</a></p>
     </article>
 
+    <!--
+      Região experimental: o app.js insere em #componente apenas o elemento do
+      cenário escolhido pela URL. data-estado sinaliza carregando, pronto ou erro.
+    -->
     <section id="cenario" class="cenario" data-estado="carregando" aria-labelledby="titulo-cenario">
       <p class="rotulo rotulo-cenario">Cenário experimental</p>
       <h2 id="titulo-cenario">Elemento em destaque</h2>
