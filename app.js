@@ -6,7 +6,9 @@
  *
  * A URL seleciona um cenário desta mesma aplicação (tipo, versão e condição de
  * carga); não são aplicações diferentes. Cada execução insere somente um
- * componente em #componente, de acordo com o parâmetro "tipo".
+ * componente em #componente, de acordo com o parâmetro "tipo". Sem o parâmetro
+ * "versao" (ou com valor inválido), a aplicação mostra apenas a página de
+ * escolha, que não inicializa o cenário experimental.
  *
  * Os cinco defeitos são intencionais e controlados: existem apenas na versão
  * "defeito" e são o objeto de análise do experimento. Não devem ser corrigidos
@@ -27,6 +29,32 @@
   const ATRASO_PADRAO_FIXA_MS = 2000;
   const LIMITE_CARREGAMENTO_MS = 15000;
   const SVG_NS = "http://www.w3.org/2000/svg";
+
+  /*
+   * A versão é obrigatória nas páginas experimentais. Sem uma versão válida,
+   * a aplicação mostra a página de escolha e encerra a inicialização antes de
+   * criar window.experimento, timers ou qualquer sinal de prontidão. O valor
+   * inválido também não é convertido silenciosamente em uma condição padrão.
+   */
+  const parametrosDaUrl = new URLSearchParams(window.location.search);
+  const versoesInformadas = parametrosDaUrl.getAll("versao");
+  const versaoValida =
+    versoesInformadas.length === 1 && VERSOES_VALIDAS.includes(versoesInformadas[0]);
+
+  if (!versaoValida) {
+    configurarEscolha(versoesInformadas.length > 0);
+    return;
+  }
+
+  document.documentElement.dataset.modo = "experimento";
+
+  // Remove a página de escolha do DOM para que ela não interfira na análise
+  // de acessibilidade da página experimental.
+  const escolha = document.getElementById("escolha");
+
+  if (escolha !== null) {
+    escolha.remove();
+  }
 
   class ErroConfiguracao extends Error {}
 
@@ -149,12 +177,18 @@
     }
 
     const tipo = parametros.has("tipo") ? parametros.get("tipo") : "imagem";
-    const versao = parametros.has("versao") ? parametros.get("versao") : "corrigida";
+    const versao = parametros.get("versao");
     const carga = parametros.has("carga") ? parametros.get("carga") : "imediata";
 
     if (!TIPOS_VALIDOS.includes(tipo)) {
       throw new ErroConfiguracao(
         `Valor inválido para "tipo": "${tipo}". Valores aceitos: imagem, campo, botao, contraste e link.`
+      );
+    }
+
+    if (!parametros.has("versao")) {
+      throw new ErroConfiguracao(
+        'O parâmetro "versao" é obrigatório e deve ser defeito ou corrigida.'
       );
     }
 
@@ -209,6 +243,56 @@
     }
 
     return valor;
+  }
+
+  /*
+   * Página de escolha: usada quando "versao" está ausente ou não é exatamente
+   * um dos valores aceitos. Ela fica fora das medições; por isso o portal
+   * experimental é removido do DOM e nenhum estado de prontidão é criado.
+   */
+  function configurarEscolha(versaoInformadaInvalida) {
+    document.documentElement.dataset.modo = "escolha";
+
+    const portal = document.getElementById("portal-experimental");
+
+    if (portal !== null) {
+      portal.remove();
+    }
+
+    const linksDeVersao = document.querySelectorAll("[data-versao]");
+
+    linksDeVersao.forEach((link) => {
+      const versao = link.dataset.versao;
+
+      if (VERSOES_VALIDAS.includes(versao)) {
+        link.href = criarUrlDaVersao(versao);
+      }
+    });
+
+    if (versaoInformadaInvalida) {
+      const mensagemEscolha = document.getElementById("mensagem-escolha");
+
+      if (mensagemEscolha !== null) {
+        mensagemEscolha.textContent =
+          'O valor de "versao" informado na URL não é válido. Escolha uma das duas opções abaixo para abrir a versão desejada.';
+        mensagemEscolha.hidden = false;
+      }
+    }
+
+    document.title = "Escolha a versão — Experimento de acessibilidade";
+  }
+
+  /*
+   * Monta a URL a partir do caminho atual, preservando o subdiretório e os
+   * demais parâmetros da URL. Somente "versao" é substituído pela escolha.
+   */
+  function criarUrlDaVersao(versao) {
+    const parametros = new URLSearchParams(window.location.search);
+    parametros.delete("versao");
+    parametros.set("versao", versao);
+    const consulta = parametros.toString();
+
+    return `${window.location.pathname}${consulta ? `?${consulta}` : ""}`;
   }
 
   function agendarInsercao(config) {

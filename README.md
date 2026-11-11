@@ -2,6 +2,8 @@
 
 Aplicação web experimental do trabalho da disciplina de Verificação e Validação de Software. O estudo investiga como o momento de execução dos testes automatizados afeta a detecção de violações de acessibilidade, comparando carregamento imediato, espera fixa e espera baseada no estado da aplicação.
 
+A aplicação oferece uma página inicial de escolha entre as duas versões, destinada à demonstração manual. Essa página fica fora das medições: ela não inicializa o portal experimental, seus temporizadores nem a sinalização de prontidão.
+
 Os cinco cenários estão implementados: **imagem**, **campo**, **botao**, **contraste** e **link**, cada um nas versões `defeito` e `corrigida`. A integração com axe-core, QualWeb e Playwright ainda **não** foi realizada; a capacidade de detecção dessas ferramentas será avaliada no estudo-piloto.
 
 ## Questões de pesquisa
@@ -36,7 +38,7 @@ Os endereços das fontes são apenas links de navegação, abertos na mesma aba 
 - npm `10.9.9`
 - `http-server` `14.1.1` (dependência de desenvolvimento com versão fixada)
 
-A verificação funcional das 30 combinações foi realizada no Google Chrome `156` em modo headless, limitada a funcionamento, presença do defeito ou da correção, prontidão e ausência de erros JavaScript. Nesta revisão, o mesmo procedimento foi reexecutado e complementado com validação de URL, consistência entre DOM e `window.experimento`, cache, falha, timeout e callback tardio da imagem. Nenhuma avaliação de conformidade por ferramenta automatizada foi executada. A aplicação em si não exige navegador específico além de um navegador moderno com suporte a `URLSearchParams`, `performance.now()` e `DOMContentLoaded`.
+A verificação funcional das 30 combinações foi realizada no Google Chrome `156` em modo headless, limitada a funcionamento, presença do defeito ou da correção, prontidão e ausência de erros JavaScript. Nesta revisão, o mesmo procedimento foi reexecutado e complementado com validação de URL, consistência entre DOM e `window.experimento`, cache, falha, timeout e callback tardio da imagem. Também foram verificados a página de escolha, a preservação dos demais parâmetros nos links, a orientação para versão inválida, a navegação por teclado e a ausência de `window.experimento` nessa página. Nenhuma avaliação de conformidade por ferramenta automatizada foi executada. A aplicação em si não exige navegador específico além de um navegador moderno com suporte a `URLSearchParams`, `performance.now()` e `DOMContentLoaded`.
 
 ## Instalação e execução
 
@@ -45,9 +47,7 @@ npm install
 npm start
 ```
 
-O servidor estático é iniciado em:
-
-- <http://localhost:3000>
+O servidor estático é iniciado em <http://localhost:3000>. Sem parâmetros, essa URL abre a página de escolha; as páginas experimentais usam URLs explícitas, como `http://localhost:3000/?versao=defeito`.
 
 Se a porta 3000 estiver ocupada, não encerre o processo existente. Inicie em outra porta livre usando a dependência local, por exemplo:
 
@@ -62,17 +62,43 @@ Nesse caso, use `http://localhost:3001` nas URLs abaixo.
 | Parâmetro | Valores | Padrão |
 | --- | --- | --- |
 | `tipo` | `imagem`, `campo`, `botao`, `contraste`, `link` | `imagem` |
-| `versao` | `defeito`, `corrigida` | `corrigida` |
+| `versao` | `defeito`, `corrigida` | sem padrão silencioso; ausente ou inválido abre a página de escolha |
 | `carga` | `imediata`, `fixa`, `variavel` | `imediata` |
 | `atraso` | inteiro decimal de `0` a `10000` ms | `0` para imediata; `2000` para fixa |
 
 Regras principais:
 
+- `versao` deve ser informado explicitamente para abrir uma página experimental.
+- `versao` ausente abre a página de escolha; `versao` inválido abre a mesma página com uma orientação e as duas opções.
 - `carga=imediata` aceita apenas `atraso` ausente ou `0`.
 - `carga=fixa` usa `2000` ms quando `atraso` não é informado.
 - `carga=variavel` exige `atraso` explícito.
 - A aplicação não sorteia atrasos. A sequência será definida externamente pela automação.
 - Os atrasos são configurações iniciais, sujeitas ao estudo-piloto.
+
+## Página inicial de escolha
+
+Ao acessar a aplicação sem o parâmetro `versao`, é exibida uma página de escolha com título, explicação das duas versões e dois links com aparência de botão:
+
+- **Abrir versão com defeitos**: `/?versao=defeito`
+- **Abrir versão corrigida**: `/?versao=corrigida`
+
+Os links usam o caminho atual, portanto continuam válidos quando a aplicação é hospedada em um subdiretório. Se a URL de entrada já tiver `tipo`, `carga`, `atraso` ou outros parâmetros, eles são preservados e apenas `versao` é substituído pela opção escolhida. Os dois acessos diretos com `versao` explícito continuam funcionando normalmente.
+
+A página de escolha é apenas uma porta de entrada para a demonstração manual. Ela não carrega o portal experimental no DOM, não cria `window.experimento` e não inicia temporizadores nem a sinalização de prontidão. Por isso, deve ficar fora das medições e não deve ser usada para definir o instante inicial de uma execução experimental.
+
+Se `versao` tiver um valor inválido ou repetido, a página de escolha permanece visível e mostra uma orientação acessível com as duas opções, sem selecionar silenciosamente uma condição experimental.
+
+Para a demonstração manual:
+
+1. Execute `npm start` e abra <http://localhost:3000>.
+2. Escolha uma das duas versões na página inicial.
+3. Para demonstrar outra condição de carregamento ou outro tipo, informe os parâmetros na URL, por exemplo `/?tipo=campo&versao=defeito&carga=fixa&atraso=2000`.
+4. Use o botão “Voltar” do navegador para retornar à página de escolha; as páginas experimentais não recebem menu ou botão de retorno próprio.
+
+Para testes e automação, navegue diretamente para a URL da condição desejada, sempre com `versao` explícito. Não passe pela página de escolha nem dependa da ausência de `versao` para selecionar uma versão. As três condições de carga continuam usando os mesmos marcos e critérios descritos abaixo; a página de escolha não altera esses instantes.
+
+A versão corrigida contém as correções planejadas para os cinco defeitos experimentais. Isso não representa uma avaliação de conformidade nem garante ausência de outras falhas de acessibilidade.
 
 ## Condições de carregamento
 
@@ -167,7 +193,7 @@ As seis URLs correspondem a duas versões × três condições de carregamento:
    <http://localhost:3000/?tipo=imagem&versao=defeito&carga=fixa&atraso=2000>
 3. Defeito, variável (atraso explícito de 1500 ms):
    <http://localhost:3000/?tipo=imagem&versao=defeito&carga=variavel&atraso=1500>
-4. Corrigida, imediata (padrão da aplicação):
+4. Corrigida, imediata:
    <http://localhost:3000/?tipo=imagem&versao=corrigida&carga=imediata>
 5. Corrigida, fixa:
    <http://localhost:3000/?tipo=imagem&versao=corrigida&carga=fixa>
@@ -221,6 +247,8 @@ O limite para falha de carregamento da imagem é de **15000 ms**, contado a part
 
 Pronto significa “disponível para análise”, não “aprovado em acessibilidade”. A sinalização é igual nas versões defeito e corrigida.
 
+A página de escolha não expõe `#cenario`, `#componente` nem `window.experimento` e não inicia a contagem de atraso. O contrato abaixo só existe quando a URL informa `versao=defeito` ou `versao=corrigida`.
+
 ### Consulta no console
 
 Com a página aberta, use o console do navegador para inspecionar o estado:
@@ -262,6 +290,8 @@ As decisões operacionais de S1, S2 e S3, o valor da espera fixa, a sequência d
 ## Limitações e próximos passos
 
 - Os cinco tipos estão implementados, mas nenhuma ferramenta de acessibilidade foi integrada. Nenhum resultado de detecção foi medido ou registrado.
+- A página de escolha foi verificada apenas quanto ao funcionamento e à navegação básica; ela não faz parte das medições nem de uma avaliação de conformidade.
+- A versão corrigida contém as correções planejadas para os cinco defeitos experimentais, mas não foi submetida a uma avaliação completa de acessibilidade; não há garantia de ausência de outras falhas.
 - Axe-core, QualWeb e Playwright não estão integrados; a capacidade de detecção das ferramentas será avaliada no estudo-piloto.
 - **Nenhuma avaliação de conformidade por ferramenta automatizada (axe-core, QualWeb etc.) foi realizada nesta etapa.** Inspeções funcionais de DOM, estado e nomes acessíveis no navegador não substituem uma avaliação de acessibilidade.
 - O conteúdo de apoio é composto por adaptações educativas de publicações reais, com créditos e fontes identificados. Nenhum resultado de detecção foi medido com esse conteúdo.

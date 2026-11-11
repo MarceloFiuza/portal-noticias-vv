@@ -30,6 +30,8 @@ Cada execução avalia um tipo por vez. O planejamento completo contempla 5 tipo
 
 As 30 combinações — 5 tipos × 2 versões × 3 condições de carregamento — representam configurações da aplicação. Estratégias de teste, ferramentas, repetições e coleta de resultados serão definidas separadamente. A disponibilidade dos cenários não comprova que qualquer ferramenta detecte as violações. As combinações foram verificadas quanto a funcionamento, presença do defeito/correção, prontidão, consistência entre DOM e `window.experimento` e ausência de erros JavaScript; **nenhuma avaliação de conformidade por ferramenta automatizada foi realizada nesta etapa**.
 
+Além das páginas experimentais, a aplicação oferece uma página inicial de escolha entre `defeito` e `corrigida`, destinada à demonstração manual. Essa página fica fora das medições e não inicializa o cenário experimental.
+
 ## 3. Página
 
 A página deve:
@@ -48,7 +50,24 @@ A página deve:
 
 A página básica deve evitar violações adicionais conhecidas, usando HTML semântico, hierarquia de títulos, contraste adequado no conteúdo de apoio e landmarks. O indicador de foco da estrutura de apoio usa uma cor com contraste de pelo menos 3:1 sobre o fundo branco, conforme a WCAG 2.2 SC 1.4.11. Essa é uma verificação da estrutura de apoio, não dos cinco defeitos intencionais.
 
-### 3.1 Conteúdo editorial
+### 3.1 Página de escolha
+
+Sem o parâmetro `versao`, a aplicação deve apresentar uma página de escolha, fora da medição experimental, com:
+
+- título que identifique o experimento de acessibilidade;
+- breve explicação das versões `defeito` e `corrigida`;
+- link “Abrir versão com defeitos” para `?versao=defeito`;
+- link “Abrir versão corrigida” para `?versao=corrigida`.
+
+Os links devem ser elementos HTML `a` com aparência de botão, nomes acessíveis, foco visível e contraste adequado, e devem funcionar por teclado. As URLs devem usar o caminho atual para preservar subdiretórios e manter os demais parâmetros presentes na URL, substituindo apenas `versao`.
+
+A página de escolha não deve carregar o portal experimental no DOM, criar `window.experimento`, iniciar temporizadores ou emitir sinalização de prontidão. Ela não pode ser usada como marco inicial de uma execução experimental.
+
+Um valor ausente de `versao` abre a página de escolha. Um valor inválido ou repetido também abre a página de escolha, com orientação acessível e as duas opções, sem selecionar silenciosamente uma condição experimental.
+
+A versão corrigida contém as correções planejadas para os cinco defeitos experimentais; isso não equivale a uma avaliação completa de acessibilidade nem garante ausência de outras falhas.
+
+### 3.2 Conteúdo editorial
 
 O conteúdo de apoio é composto por adaptações educativas de três publicações sobre acessibilidade. Os textos são paráfrases, não transcrições, e não representam os veículos ou órgãos citados.
 
@@ -69,7 +88,7 @@ A ilustração `assets/noticia.svg` é um recurso próprio do projeto, identific
 | Parâmetro | Valores aceitos | Obrigatório | Padrão |
 | --- | --- | --- | --- |
 | `tipo` | `imagem`, `campo`, `botao`, `contraste`, `link` | não | `imagem` |
-| `versao` | `defeito`, `corrigida` | não | `corrigida` |
+| `versao` | `defeito`, `corrigida` | sim, para abrir uma página experimental | ausente ou inválido abre a página de escolha |
 | `carga` | `imediata`, `fixa`, `variavel` | não | `imediata` |
 | `atraso` | inteiro decimal de 0 a 10000 (milissegundos) | depende da carga | ver regras abaixo |
 
@@ -96,9 +115,11 @@ A aplicação deve rejeitar, com mensagem clara e sem conversão silenciosa:
 
 Configurações inválidas resultam em estado `erro`, sem inserir o componente. A mensagem deve ser exibida na região `#cenario` e registrada em `window.experimento.erro`.
 
+A ausência de `versao` não é um erro de configuração experimental: ela abre a página de escolha. Um valor inválido ou repetido também abre a página de escolha, com uma orientação acessível e os dois links de versão, sem inicializar `window.experimento`. Demais parâmetros inválidos continuam resultando em estado `erro` quando a versão é válida.
+
 ## 5. Componentes implementados
 
-Todos os componentes usam o conteúdo educativo adaptado descrito na seção 3.1. Apenas o componente solicitado é inserido em `#componente`; os demais não são criados.
+Todos os componentes usam o conteúdo educativo adaptado descrito na seção 3.2. Apenas o componente solicitado é inserido em `#componente`; os demais não são criados.
 
 ### 5.1 `imagem`
 
@@ -216,6 +237,8 @@ Se a imagem falhar, o cenário passa para `erro` e exibe uma mensagem clara. O l
 
 `pronto` significa que o componente está disponível para análise, não que ele foi aprovado em acessibilidade. A sinalização é igual nas versões `defeito` e `corrigida`.
 
+A página de escolha não possui `#cenario`, `#componente`, `#mensagem-estado` nem `window.experimento`, e não agenda inserção. A verificação descrita nesta seção se aplica somente às páginas abertas com `versao=defeito` ou `versao=corrigida`.
+
 ## 8. Contrato de `window.experimento`
 
 A aplicação expõe um objeto para observação pela automação:
@@ -245,6 +268,8 @@ window.experimento = {
 Todos os instantes usam `performance.now()` e são relativos ao início da navegação. Campos ainda não disponíveis permanecem `null`. Na condição imediata, `instanteInsercao` pode ser anterior a `instanteDomContentLoaded`; nos componentes sem recurso assíncrono, `instanteProntidao` também pode anteceder `DOMContentLoaded`.
 
 A resolução de `performance.now()` pode fazer dois instantes muito próximos coincidirem numericamente. Na condição `imediata`, a ordem é garantida pela execução síncrona do script `defer` antes de `DOMContentLoaded`, não pela desigualdade numérica entre os dois campos.
+
+`window.experimento` só é criado quando a URL informa `versao=defeito` ou `versao=corrigida`. Na página de escolha, inclusive no caso de `versao` inválido, o objeto não existe e nenhum timer experimental é iniciado. Os testes e scripts de automação devem navegar diretamente para a URL da versão desejada, sem passar pela página de escolha.
 
 A aplicação não registra resultados de detecção de acessibilidade. As estratégias S1, S2 e S3 pertencem aos futuros scripts de teste.
 
@@ -276,3 +301,5 @@ As decisões abaixo não estão definidas nesta etapa e não devem ser tratadas 
 - A ilustração local `assets/noticia.svg` foi refeita como uma interface digital acessível. Ela é um recurso do projeto e não reproduz imagens das fontes.
 - O contrato experimental foi preservado: parâmetros de URL, 30 combinações, estados `carregando`, `pronto` e `erro`, `window.experimento`, marcos de temporização, tratamento de cache, erro e timeout da imagem e proteção contra callbacks tardios.
 - Nenhum resultado de temporização ou de detecção de acessibilidade havia sido registrado com o conteúdo anterior. Tempos e resultados de etapas futuras deverão corresponder a esta versão do conteúdo.
+- Foi adicionada uma página inicial de escolha entre as versões, fora das medições. Ela preserva subdiretórios e os demais parâmetros da URL, orienta valores inválidos de `versao` e não inicializa o portal experimental, timers ou `window.experimento`.
+- O parâmetro `versao` deixou de ter valor padrão silencioso nas páginas experimentais. Testes, scripts e demonstrações devem informar `versao=defeito` ou `versao=corrigida` explicitamente.

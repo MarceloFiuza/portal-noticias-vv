@@ -7,10 +7,57 @@
   <title>Portal de Notícias Experimental</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="styles.css">
+  <!--
+    Define o modo antes do primeiro desenho: a página de escolha fica fora das
+    medições e só é substituída quando a URL informa uma versão válida.
+  -->
+  <script>
+    (() => {
+      const parametros = new URLSearchParams(window.location.search);
+      const versoes = parametros.getAll("versao");
+      const valida = versoes.length === 1 && (versoes[0] === "defeito" || versoes[0] === "corrigida");
+      document.documentElement.dataset.modo = valida ? "experimento" : "escolha";
+    })();
+  </script>
   <!-- defer: o HTML já está disponível e a inicialização ocorre antes de DOMContentLoaded. -->
   <script src="app.js" defer></script>
 </head>
 <body>
+  <section id="escolha" class="escolha" aria-labelledby="titulo-escolha">
+    <header class="cabecalho">
+      <div class="container">
+        <p class="rotulo rotulo-claro">Verificação e Validação de Software</p>
+        <h1 id="titulo-escolha">Experimento de acessibilidade</h1>
+        <p class="subtitulo">Escolha uma versão do portal experimental para a demonstração manual. Esta página de escolha não faz parte das medições do experimento.</p>
+      </div>
+    </header>
+
+    <main class="container escolha-conteudo">
+      <p class="observacao">Portal experimental acadêmico. A página de escolha não inicializa o cenário experimental, seus temporizadores nem a sinalização de prontidão.</p>
+
+      <p id="mensagem-escolha" class="mensagem" role="alert" hidden></p>
+
+      <h2>Duas versões, o mesmo cenário</h2>
+      <p>A <strong>versão com defeitos</strong> mantém as violações de acessibilidade planejadas para o estudo. A <strong>versão corrigida</strong> aplica as correções correspondentes. O conteúdo, a estrutura e a sinalização de prontidão são equivalentes, exceto pelas diferenças intencionais dos defeitos.</p>
+      <p class="orientacao-escolha">Escolha abaixo a versão que deseja abrir. Os links podem ser acionados pelo teclado e mantêm os demais parâmetros presentes na URL.</p>
+
+      <ul class="opcoes-escolha">
+        <li><a class="botao-escolha" data-versao="defeito" href="?versao=defeito">Abrir versão com defeitos</a></li>
+        <li><a class="botao-escolha botao-escolha--secundario" data-versao="corrigida" href="?versao=corrigida">Abrir versão corrigida</a></li>
+      </ul>
+
+      <p class="nota-escolha">A versão corrigida contém as correções planejadas para os cinco defeitos experimentais; isso não garante que esteja livre de outras falhas de acessibilidade.</p>
+    </main>
+
+    <footer class="rodape">
+      <div class="container">
+        <p>Portal de Notícias Experimental — projeto acadêmico da disciplina de Verificação e Validação de Software.</p>
+        <p>Página de escolha para demonstração manual; fora do escopo das medições experimentais.</p>
+      </div>
+    </footer>
+  </section>
+
+  <div id="portal-experimental">
   <header class="cabecalho">
     <div class="container">
       <p class="rotulo rotulo-claro">Verificação e Validação de Software</p>
@@ -71,5 +118,6 @@
       <p>Textos adaptados para uso educativo; a autoria e o crédito das publicações originais são dos veículos e órgãos citados. A ilustração do cenário de imagem é um recurso próprio do projeto.</p>
     </div>
   </footer>
+  </div>
 </body>
 </html>

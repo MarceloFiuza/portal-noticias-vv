@@ -38,6 +38,26 @@ body {
   margin-inline: auto;
 }
 
+/*
+ * A página de escolha fica fora das medições. Ela é o modo padrão e só dá
+ * lugar ao portal experimental quando a URL informa uma versão válida.
+ */
+#escolha {
+  display: block;
+}
+
+#portal-experimental {
+  display: none;
+}
+
+html[data-modo="experimento"] #escolha {
+  display: none;
+}
+
+html[data-modo="experimento"] #portal-experimental {
+  display: block;
+}
+
 .cabecalho {
   background: linear-gradient(135deg, var(--destaque-escuro), var(--destaque));
   border-bottom: 4px solid #f2b134;
@@ -80,6 +100,80 @@ main {
 
 .observacao {
   margin: 0 0 1.5rem;
+  color: var(--texto-suave);
+  font-size: 0.9rem;
+}
+
+.escolha-conteudo {
+  max-width: 48rem;
+  margin-block: 2rem;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  background-color: var(--superficie);
+  border: 1px solid var(--borda);
+  border-left: 6px solid var(--destaque);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(31, 45, 61, 0.06);
+}
+
+.escolha-conteudo h2 {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.3rem, 3vw, 1.75rem);
+  line-height: 1.3;
+}
+
+.escolha-conteudo p:not(.observacao):not(.mensagem):not(.nota-escolha) {
+  margin: 0 0 1rem;
+  color: var(--texto-suave);
+}
+
+.orientacao-escolha {
+  margin-top: 1.5rem;
+}
+
+.opcoes-escolha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.botao-escolha {
+  display: inline-block;
+  padding: 0.85rem 1.4rem;
+  background-color: var(--destaque);
+  border: 2px solid var(--destaque);
+  border-radius: 0.5rem;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+.botao-escolha:hover {
+  background-color: var(--destaque-escuro);
+  border-color: var(--destaque-escuro);
+}
+
+.botao-escolha--secundario {
+  background-color: #ffffff;
+  color: var(--destaque-escuro);
+}
+
+.botao-escolha--secundario:hover {
+  background-color: #e8eff3;
+  border-color: var(--destaque-escuro);
+  color: var(--destaque-escuro);
+}
+
+.botao-escolha:focus-visible {
+  outline: 3px solid var(--foco);
+  outline-offset: 3px;
+}
+
+.nota-escolha {
+  margin: 1.5rem 0 0;
   color: var(--texto-suave);
   font-size: 0.9rem;
 }
